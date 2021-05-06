@@ -4,6 +4,7 @@ from timer import Timer
 import time
 import os
 from datetime import datetime
+from pandas import DataFrame
 
 
 t = Timer()
@@ -18,10 +19,15 @@ def generate_letter(letters_list):
 
 
 def check_result(letter_to_compare):
+    """Take letter and compare to user input. Returns True/False and -1"""
+
     with keyboard.Events() as events:
         # Block for as much as possible
-        event = events.get(20)
+        event = events.get(3)
 
+        if event is None:
+            print("You did not press a key within one second")
+            return False
         if event.key == keyboard.KeyCode.from_char(letter_to_compare):
             return True
         if event.key == keyboard.Key.esc:
@@ -31,13 +37,14 @@ def check_result(letter_to_compare):
 
 
 def repetition(letters_list):
-    """Ask for letter from letter_list and check results.
-    Return results"""
+    """Choose random letter from letter_list and check results.
+    Return results or -1"""
     letter = generate_letter(letters_list)
+    os.system("clear")
     print(letter)
     t.start()
     result = check_result(letter)
-    os.system("clear")
+
     if result != -1:
         repetition_result = [letter, result, t.stop()]
         return repetition_result
@@ -47,7 +54,6 @@ def repetition(letters_list):
 
 
 def exersize(letters_list):
-    exersize_result = []
     repetitions_result = []
     exersize_time = datetime.now()
 
@@ -60,10 +66,15 @@ def exersize(letters_list):
         time.sleep(1)
         repetitions_result.append(result)
 
-    for l in repetitions_result:
-        l.append(exersize_time)
+    exersize_result = DataFrame(
+        repetitions_result, columns=["Letter", "Success", "Time"]
+    )
+
+    exersize_result["Exersise_date"] = exersize_time
     print("your results:")
-    print(repetitions_result)
+    print(exersize_result["Success"].value_counts(normalize=True) * 100)
+    # print(exersize_result)
+    # exersize_result.info()
 
 
 exersize(letters_1)

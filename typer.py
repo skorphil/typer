@@ -5,6 +5,7 @@ import time
 import os
 from datetime import datetime
 from pandas import DataFrame
+import sqlite3
 
 
 t = Timer()
@@ -46,7 +47,7 @@ def repetition(letters_list):
     result = check_result(letter)
 
     if result != -1:
-        repetition_result = [letter, result, t.stop()]
+        repetition_result = [letter, result, t.stop(), datetime.now()]
         return repetition_result
     else:
         t.stop()
@@ -56,6 +57,7 @@ def repetition(letters_list):
 def exersize(letters_list):
     repetitions_result = []
     exersize_time = datetime.now()
+    repetitions_count = 0
 
     while True:
         result = repetition(letters_list)
@@ -63,21 +65,42 @@ def exersize(letters_list):
             os.system("clear")
             print("ESC is pressed")
             break
-        time.sleep(1)
+        time.sleep(0.7)
         repetitions_result.append(result)
 
     exersize_result = DataFrame(
-        repetitions_result, columns=["Letter", "Success", "Time"]
+        repetitions_result, columns=["Letter", "Success", "Time", "Date"]
     )
 
     exersize_result["Exersise_date"] = exersize_time
     print("your results:")
     print(exersize_result["Success"].value_counts(normalize=True) * 100)
+    return exersize_result
+
+
+def write_to_db(results_df):
+
+    conn = sqlite3.connect("typer.db")
+    c = conn.cursor()
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS Letters_stat (
+            Letter TEXT, 
+            Success INTEGER, 
+            Time REAL, 
+            Date TIMESTAMP,
+            Exersise_date TIMESTAMP
+            )"""
+    )
+    conn.commit()
+    results_df.to_sql("Letters_stat", conn, if_exists="append", index=False)
+    c.close()  # and your cursor when you're done!
+    conn.close()  # always a good habit to close your connections
+
     # print(exersize_result)
     # exersize_result.info()
 
 
-exersize(letters_1)
+write_to_db(exersize(letters_1))
 
 # print(generator(letters_1))
 

@@ -1,16 +1,20 @@
 from random import randrange
 from pynput import keyboard
-from timer import Timer
+from timer import Timer  # Custom library in directory
 import time
 import os
 from datetime import datetime
 from pandas import DataFrame
 import sqlite3
 
+# from pydub import AudioSegment
+# from pydub.playback import play
+from playsound import playsound
+
 
 t = Timer()
 
-letters_1 = ["в", "а", "о", "л"]
+letters_1 = ["в", "а", "о", "л", "ы", "д"]
 
 
 def generate_letter(letters_list):
@@ -28,12 +32,15 @@ def check_result(letter_to_compare):
 
         if event is None:
             print("You did not press a key within one second")
+            playsound("error.wav")
             return False
         if event.key == keyboard.KeyCode.from_char(letter_to_compare):
+            playsound("good.wav")
             return True
         if event.key == keyboard.Key.esc:
             return -1
         else:
+            playsound("error.wav")
             return False
 
 
@@ -65,7 +72,7 @@ def exersize(letters_list):
             os.system("clear")
             print("ESC is pressed")
             break
-        time.sleep(0.7)
+        time.sleep(0.3)
         repetitions_result.append(result)
 
     exersize_result = DataFrame(

@@ -14,7 +14,7 @@ from playsound import playsound
 
 t = Timer()
 
-letters_1 = ["в", "а", "о", "л", "ы", "д"]
+letters_1 = ["е", "а", "о", "н", "т", "и" , "н"]
 
 
 def generate_letter(letters_list):
